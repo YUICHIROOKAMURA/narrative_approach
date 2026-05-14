@@ -1,0 +1,2127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ナラティブアプローチ — 物語を通じた支援の理論と実践</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-light: #3d3d3d;
+    --ink-faint: #6b6b6b;
+    --page: #f7f4ef;
+    --page-warm: #efe9df;
+    --page-deep: #e5ddd0;
+    --terracotta: #b5533c;
+    --terracotta-light: #d4795f;
+    --terracotta-pale: #f0ddd8;
+    --teal: #2d6e6e;
+    --teal-light: #4a9090;
+    --teal-pale: #d4eaea;
+    --gold: #8a6f3e;
+    --gold-pale: #f0e8d5;
+    --border: #c9bfb0;
+    --serif: 'Noto Serif JP', serif;
+    --sans: 'Noto Sans JP', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: var(--serif);
+    line-height: 1.9;
+    overflow-x: hidden;
+  }
+
+  /* ── Progress Bar ── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: var(--terracotta);
+    width: 0%;
+    z-index: 1000;
+    transition: width 0.1s linear;
+  }
+
+  /* ── Sticky Nav ── */
+  #sticky-nav {
+    position: fixed;
+    top: 0; right: 0;
+    width: 200px;
+    padding: 20px 16px;
+    z-index: 900;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .nav-dot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+    font-family: var(--sans);
+    font-size: 10px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-dot:hover, .nav-dot.active { opacity: 1; }
+  .nav-dot::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--terracotta);
+    flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+  .nav-dot.active::before { transform: scale(1.6); }
+
+  /* ── Reveal Animation ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
+
+  /* ── Common Layout ── */
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  section {
+    padding: 80px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--terracotta);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  p {
+    font-size: 15px;
+    color: var(--ink-light);
+    margin-bottom: 16px;
+  }
+
+  strong { color: var(--ink); font-weight: 500; }
+
+  /* ── Hero ── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: var(--ink);
+    color: var(--page);
+    position: relative;
+    overflow: hidden;
+    border-bottom: none;
+    padding: 0;
+  }
+
+  #hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(ellipse at 70% 30%, rgba(45,110,110,0.3) 0%, transparent 60%),
+                radial-gradient(ellipse at 20% 80%, rgba(181,83,60,0.2) 0%, transparent 50%);
+  }
+
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  .hero-kicker {
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--terracotta-light);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .hero-title {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--page);
+    margin-bottom: 24px;
+  }
+
+  .hero-title span {
+    color: var(--terracotta-light);
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(247,244,239,0.7);
+    max-width: 560px;
+    margin-bottom: 48px;
+    font-family: var(--sans);
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .hero-meta-item {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: rgba(247,244,239,0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero-meta-item::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--terracotta-light);
+  }
+
+  /* ── Quote Block ── */
+  .quote-block {
+    background: var(--page-warm);
+    border-left: 3px solid var(--terracotta);
+    padding: 24px 28px;
+    margin: 32px 0;
+    border-radius: 0 4px 4px 0;
+  }
+
+  .quote-text {
+    font-size: 17px;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1.9;
+    margin-bottom: 8px;
+  }
+
+  .quote-source {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  /* ── Concept Cards ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+
+  .concept-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    transition: box-shadow 0.3s, transform 0.3s;
+    cursor: default;
+  }
+
+  .concept-card:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-faint);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  /* ── Flow Diagram ── */
+  .flow-diagram {
+    background: var(--page-warm);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 32px 0;
+  }
+
+  .flow-step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .flow-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 44px;
+    width: 2px;
+    height: calc(100% - 20px);
+    background: var(--border);
+  }
+
+  .flow-num {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .flow-num.terracotta { background: var(--terracotta); color: white; }
+  .flow-num.teal { background: var(--teal); color: white; }
+  .flow-num.gold { background: var(--gold); color: white; }
+
+  .flow-content h4 {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+    padding-top: 8px;
+  }
+
+  .flow-content p {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-faint);
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  /* ── Split Layout ── */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 32px 0;
+  }
+
+  @media (max-width: 600px) {
+    .split { grid-template-columns: 1fr; }
+    #sticky-nav { display: none; }
+    .hero-meta { flex-direction: column; gap: 12px; }
+  }
+
+  .split-panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  .split-panel.accent-left {
+    border-left: 3px solid var(--terracotta);
+  }
+
+  .split-panel.accent-teal {
+    border-left: 3px solid var(--teal);
+  }
+
+  .panel-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .panel-label.red { color: var(--terracotta); }
+  .panel-label.teal { color: var(--teal); }
+
+  /* ── Technique Block ── */
+  .technique-section {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin: 24px 0;
+    overflow: hidden;
+  }
+
+  .technique-header {
+    background: var(--ink);
+    color: var(--page);
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+  }
+
+  .technique-header:hover {
+    background: #2a2a2a;
+  }
+
+  .technique-num {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--terracotta-light);
+  }
+
+  .technique-title {
+    font-size: 16px;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .technique-sub {
+    font-family: var(--sans);
+    font-size: 12px;
+    color: rgba(247,244,239,0.5);
+  }
+
+  .technique-toggle {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .technique-toggle svg {
+    stroke: var(--page);
+    opacity: 0.6;
+  }
+
+  .technique-body {
+    display: none;
+    padding: 28px;
+  }
+
+  .technique-body.open {
+    display: block;
+  }
+
+  .technique-toggle.open {
+    transform: rotate(180deg);
+  }
+
+  /* ── Dialogue Simulation ── */
+  .dialogue-box {
+    background: var(--page-warm);
+    border-radius: 12px;
+    padding: 28px;
+    margin: 24px 0;
+  }
+
+  .dialogue-title {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dialogue-line {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+
+  .dialogue-speaker {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .dialogue-speaker.staff {
+    background: var(--teal);
+    color: white;
+  }
+
+  .dialogue-speaker.client {
+    background: var(--page-deep);
+    color: var(--ink);
+  }
+
+  .dialogue-text {
+    font-size: 14px;
+    color: var(--ink-light);
+    line-height: 1.8;
+    margin: 0;
+    font-family: var(--sans);
+  }
+
+  .dialogue-note {
+    font-size: 12px;
+    color: var(--terracotta);
+    font-style: italic;
+    margin-top: 4px;
+    font-family: var(--sans);
+  }
+
+  /* ── Timeline ── */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+    margin: 32px 0;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+
+  .timeline-item {
+    position: relative;
+    margin-bottom: 32px;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -28px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--terracotta);
+    border: 2px solid var(--page);
+    box-shadow: 0 0 0 2px var(--terracotta);
+  }
+
+  .timeline-year {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--terracotta);
+    margin-bottom: 4px;
+  }
+
+  .timeline-content h4 {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .timeline-content p {
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-family: var(--sans);
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  /* ── Comparison Table ── */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 32px 0;
+    font-family: var(--sans);
+    font-size: 13px;
+  }
+
+  .compare-table th {
+    background: var(--ink);
+    color: var(--page);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    font-size: 12px;
+  }
+
+  .compare-table th:first-child { border-radius: 8px 0 0 0; }
+  .compare-table th:last-child { border-radius: 0 8px 0 0; }
+
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--ink-light);
+    vertical-align: top;
+    line-height: 1.6;
+  }
+
+  .compare-table tr:nth-child(even) td { background: var(--page-warm); }
+  .compare-table tr:last-child td { border-bottom: none; }
+  .compare-table td:first-child { font-weight: 500; color: var(--ink); }
+
+  /* ── Warning Box ── */
+  .warning-box {
+    border: 1px solid var(--terracotta);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    background: var(--terracotta-pale);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .warning-icon {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .warning-text {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .warning-title {
+    font-weight: 700;
+    color: var(--terracotta);
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* ── Info Box ── */
+  .info-box {
+    border: 1px solid var(--teal);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    background: var(--teal-pale);
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .info-text {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-light);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .info-title {
+    font-weight: 700;
+    color: var(--teal);
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* ── SVG Illustration ── */
+  .svg-container {
+    margin: 32px 0;
+    text-align: center;
+  }
+
+  /* ── Section BG variants ── */
+  .section-warm { background: var(--page-warm); }
+  .section-deep { background: var(--page-deep); }
+  .section-dark {
+    background: var(--ink);
+    color: var(--page);
+    border-bottom: none;
+  }
+
+  .section-dark h2 { color: var(--page); }
+  .section-dark p { color: rgba(247,244,239,0.7); }
+  .section-dark strong { color: var(--page); }
+  .section-dark .section-label { color: var(--terracotta-light); }
+
+  /* ── Reference List ── */
+  .ref-list {
+    list-style: none;
+    margin: 24px 0;
+  }
+
+  .ref-list li {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--ink-faint);
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.7;
+  }
+
+  .ref-list li:last-child { border-bottom: none; }
+
+  .ref-list a {
+    color: var(--teal);
+    text-decoration: none;
+  }
+
+  .ref-list a:hover { text-decoration: underline; }
+
+  /* ── Footer ── */
+  footer {
+    background: var(--ink);
+    color: rgba(247,244,239,0.4);
+    text-align: center;
+    padding: 40px 24px;
+    font-family: var(--sans);
+    font-size: 12px;
+  }
+
+  /* ── Story Scroll SVG ── */
+  .story-svg-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 32px 0;
+  }
+
+  /* ── Tag Chip ── */
+  .tag-chip {
+    display: inline-block;
+    background: var(--page-deep);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-family: var(--sans);
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin: 4px 4px 4px 0;
+  }
+
+  /* ── Highlight Text ── */
+  .highlight {
+    background: linear-gradient(transparent 60%, var(--gold-pale) 60%);
+    padding: 0 2px;
+  }
+
+  /* ── Iceberg SVG ── */
+  #iceberg-svg text {
+    font-family: var(--sans);
+    font-size: 13px;
+  }
+
+  /* ── Animate line ── */
+  @keyframes dash {
+    to { stroke-dashoffset: 0; }
+  }
+
+  .animate-path {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+  }
+
+  .animate-path.animated {
+    animation: dash 1.5s ease forwards;
+  }
+
+  /* ── pill badge ── */
+  .pill {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .pill-red { background: var(--terracotta); color: white; }
+  .pill-teal { background: var(--teal); color: white; }
+  .pill-gold { background: var(--gold); color: white; }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- Sticky Nav -->
+<nav id="sticky-nav">
+  <a class="nav-dot active" href="#hero">はじめに</a>
+  <a class="nav-dot" href="#what-is-narrative">物語とは何か</a>
+  <a class="nav-dot" href="#dominant-story">支配的物語の問題</a>
+  <a class="nav-dot" href="#history">理論の誕生</a>
+  <a class="nav-dot" href="#externalisation">外在化</a>
+  <a class="nav-dot" href="#unique-outcomes">例外の探索</a>
+  <a class="nav-dot" href="#reauthoring">物語の書き直し</a>
+  <a class="nav-dot" href="#practice">就労移行での実践</a>
+  <a class="nav-dot" href="#witness">証人実践</a>
+  <a class="nav-dot" href="#critique">批判的検討</a>
+  <a class="nav-dot" href="#self-understanding">自己理解面談との接続</a>
+  <a class="nav-dot" href="#references">参考文献</a>
+</nav>
+
+<!-- ══════════════════════════════════════════ HERO ══ -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-kicker reveal">就労移行支援スタッフのための支援理論</div>
+    <h1 class="hero-title reveal reveal-delay-1">
+      ナラティブ<br><span>アプローチ</span>
+    </h1>
+    <p class="hero-sub reveal reveal-delay-2">
+      「私はダメな人間だ」という物語は、どこから来るのか。<br>
+      そして、支援者はその物語にどう関わることができるのか。<br>
+      ホワイトとエプストンが発見した、物語を通じた支援の理論と実践。
+    </p>
+    <div class="hero-meta reveal reveal-delay-3">
+      <span class="hero-meta-item">Michael White &amp; David Epston, 1989</span>
+      <span class="hero-meta-item">ポストモダン臨床理論</span>
+      <span class="hero-meta-item">就労移行支援への応用</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ WHAT IS NARRATIVE ══ -->
+<section id="what-is-narrative">
+  <div class="container">
+    <div class="section-label reveal">Chapter 01 — 人間と物語</div>
+    <h2 class="reveal">人は「物語」の中に<br>生きている</h2>
+
+    <p class="reveal">私たちは日々の出来事をそのまま記憶しているわけではありません。経験を選択し、つなぎ合わせ、意味を与えることで「物語」を作り上げ、それを「自分」と呼んでいます。</p>
+
+    <div class="quote-block reveal">
+      <p class="quote-text">「人は自分の経験を物語として意味づけており、これらの物語が経験を形作り、人生を構成する。物語は生きられ、それと同時に語られる。」</p>
+      <p class="quote-source">— White, M. &amp; Epston, D. (1990). <em>Narrative Means to Therapeutic Ends.</em> Norton. p.10</p>
+    </div>
+
+    <p class="reveal">これは比喩ではありません。人間の認知は<strong>物語的に構造化されている</strong>という、認知科学・神経科学・哲学にまたがる知見です。心理学者ダン・マクアダムズは、アイデンティティそのものを「自分が作り続ける個人的神話（personal myth）」と定義しています。</p>
+
+    <!-- SVG: Brain to Story -->
+    <div class="svg-container reveal">
+      <svg width="680" height="200" viewBox="0 0 680 200" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+        <!-- Step boxes -->
+        <rect x="20" y="70" width="120" height="60" rx="8" fill="#e5ddd0" stroke="#c9bfb0"/>
+        <text x="80" y="96" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a">出来事が起きる</text>
+        <text x="80" y="114" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#6b6b6b">（経験の原料）</text>
+
+        <!-- Arrow -->
+        <path d="M140 100 L180 100" stroke="#c9bfb0" stroke-width="2" marker-end="url(#arr1)"/>
+
+        <rect x="182" y="70" width="120" height="60" rx="8" fill="#e5ddd0" stroke="#c9bfb0"/>
+        <text x="242" y="96" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a">選択・解釈</text>
+        <text x="242" y="114" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#6b6b6b">（意味を与える）</text>
+
+        <path d="M302 100 L342 100" stroke="#c9bfb0" stroke-width="2" marker-end="url(#arr2)"/>
+
+        <rect x="344" y="70" width="120" height="60" rx="8" fill="#f0ddd8" stroke="#b5533c"/>
+        <text x="404" y="96" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a" font-weight="500">物語が生まれる</text>
+        <text x="404" y="114" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#b5533c">（自己認識になる）</text>
+
+        <path d="M464 100 L504 100" stroke="#c9bfb0" stroke-width="2" marker-end="url(#arr3)"/>
+
+        <rect x="506" y="70" width="140" height="60" rx="8" fill="#1a1a1a" stroke="#1a1a1a"/>
+        <text x="576" y="96" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#f7f4ef" font-weight="500">行動・選択を</text>
+        <text x="576" y="114" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#d4795f">規定する</text>
+
+        <!-- feedback loop -->
+        <path d="M576 130 Q576 170 404 170 Q242 170 242 130" stroke="#c9bfb0" stroke-width="1.5" stroke-dasharray="4 3" fill="none" marker-end="url(#arr4)"/>
+        <text x="404" y="188" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">物語が経験の解釈を先取りする</text>
+
+        <defs>
+          <marker id="arr1" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#c9bfb0"/>
+          </marker>
+          <marker id="arr2" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#c9bfb0"/>
+          </marker>
+          <marker id="arr3" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto">
+            <path d="M0 0 L8 4 L0 8 Z" fill="#c9bfb0"/>
+          </marker>
+          <marker id="arr4" markerWidth="8" markerHeight="8" refX="0" refY="4" orient="auto">
+            <path d="M8 0 L0 4 L8 8 Z" fill="#c9bfb0"/>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+
+    <p class="reveal">重要なのは、この物語は<strong>一度作られたら固定されるものではない</strong>という点です。しかし、特定の物語が長く繰り返され、周囲からも強化されると、まるで「事実」のように感じられるようになります。これが問題の温床となります。</p>
+
+    <div class="card-grid reveal">
+      <div class="concept-card">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#b5533c" stroke-width="1.5">
+          <circle cx="20" cy="20" r="16"/>
+          <path d="M20 12 L20 20 L26 26" stroke-linecap="round"/>
+          <path d="M12 20 Q20 14 28 20" stroke-dasharray="2 2"/>
+        </svg>
+        <div class="card-title">薄い描写 vs 厚い描写</div>
+        <p class="card-desc">「仕事ができない人」は薄い描写。実際の経験を丁寧にたどると、より複雑で豊かな「厚い描写」が生まれる。</p>
+      </div>
+      <div class="concept-card">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#2d6e6e" stroke-width="1.5">
+          <rect x="8" y="8" width="24" height="28" rx="2"/>
+          <path d="M13 16 L27 16 M13 21 L27 21 M13 26 L22 26"/>
+        </svg>
+        <div class="card-title">物語の選択性</div>
+        <p class="card-desc">どの出来事を物語に含めるかは選択の結果。「失敗した体験」だけを集めれば「失敗者の物語」になる。</p>
+      </div>
+      <div class="concept-card">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#8a6f3e" stroke-width="1.5">
+          <circle cx="20" cy="16" r="8"/>
+          <path d="M8 34 Q8 26 20 26 Q32 26 32 34"/>
+          <circle cx="20" cy="16" r="3" fill="#8a6f3e" stroke="none"/>
+        </svg>
+        <div class="card-title">社会的な物語</div>
+        <p class="card-desc">個人の物語は孤立して生まれない。家族・学校・社会の「物語の枠組み」の中で形作られる。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ DOMINANT STORY ══ -->
+<section id="dominant-story" class="section-warm">
+  <div class="container">
+    <div class="section-label reveal">Chapter 02 — 問題の発生</div>
+    <h2 class="reveal">「支配的物語」が<br>人を苦しめるとき</h2>
+
+    <p class="reveal">ナラティブアプローチが注目するのは、特定の物語が<strong>「支配的物語（dominant story）」</strong>として固定化され、人の可能性を狭めてしまう状況です。</p>
+
+    <!-- Iceberg diagram -->
+    <div class="svg-container reveal">
+      <svg width="560" height="360" viewBox="0 0 560 360" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+        <!-- sea surface -->
+        <rect x="0" y="160" width="560" height="200" fill="#d4eaea" rx="4"/>
+        <!-- iceberg above -->
+        <polygon points="280,20 180,160 380,160" fill="#f0ddd8" stroke="#b5533c" stroke-width="1.5"/>
+        <!-- iceberg below -->
+        <polygon points="180,160 120,280 260,340 380,340 440,280 380,160" fill="#b5533c" opacity="0.25"/>
+        <polygon points="180,160 120,280 260,340 380,340 440,280 380,160" stroke="#b5533c" stroke-width="1.5" fill="none"/>
+
+        <!-- water line label -->
+        <line x1="20" y1="160" x2="540" y2="160" stroke="#4a9090" stroke-width="1" stroke-dasharray="4 3"/>
+        <text x="30" y="155" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#2d6e6e">意識にのぼる層</text>
+        <text x="30" y="175" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#2d6e6e">意識しにくい層</text>
+
+        <!-- above text -->
+        <text x="280" y="95" text-anchor="middle" font-family="'Noto Serif JP', serif" font-size="13" fill="#1a1a1a" font-weight="700">「私はダメな人間だ」</text>
+        <text x="280" y="116" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#6b6b6b">表面に見える自己認識</text>
+        <text x="280" y="134" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#6b6b6b">（支配的物語）</text>
+
+        <!-- below text items -->
+        <text x="280" y="205" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a">失敗した体験の強調・反復</text>
+        <text x="280" y="228" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a">成功体験の無視・過小評価</text>
+        <text x="280" y="251" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a">社会・家族からの「問題者」ラベル</text>
+        <text x="280" y="274" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a">権力関係が生む自己否定の内面化</text>
+        <text x="280" y="297" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a">語られなかった代替的な経験</text>
+
+        <!-- arrow showing hidden -->
+        <text x="480" y="250" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#b5533c">支配的物語が</text>
+        <text x="480" y="264" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#b5533c">覆い隠す領域</text>
+      </svg>
+    </div>
+
+    <div class="split reveal">
+      <div class="split-panel accent-left">
+        <div class="panel-label red">問題飽和した物語</div>
+        <h3>Problem-saturated story</h3>
+        <p style="font-size:13px; font-family:var(--sans);">「また失敗した」「やっぱり自分はダメだ」という経験が積み重なり、その解釈が唯一の現実になった状態。問題と関係のない経験（資格取得、助け合い、趣味での達成）が見えなくなる。</p>
+      </div>
+      <div class="split-panel accent-teal">
+        <div class="panel-label teal">権力と知識の問題</div>
+        <h3>フーコーの影響</h3>
+        <p style="font-size:13px; font-family:var(--sans);">「正常」と「異常」を定める診断や評価は、中立ではなく<strong>権力の作用</strong>。ホワイトはこの視点を取り込み、専門家の知識が人をラベリングし、特定の物語を「真実」として固定化する危険を指摘した。</p>
+      </div>
+    </div>
+
+    <div class="info-box reveal">
+      <svg class="warning-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#2d6e6e" stroke-width="1.5">
+        <circle cx="10" cy="10" r="8"/>
+        <path d="M10 6 L10 10.5" stroke-linecap="round"/>
+        <circle cx="10" cy="13.5" r="0.8" fill="#2d6e6e" stroke="none"/>
+      </svg>
+      <div>
+        <span class="info-title">就労移行支援での現れ方</span>
+        <p class="info-text">利用者が語る「どうせ私は続かない」「また迷惑をかけてしまった」は、単なる自信のなさではなく、長年にわたって構築されてきた<strong>支配的物語の表現</strong>です。この物語を「認知の歪み」として修正しようとするのと、「物語として外から見る機会を作る」のでは、実践が根本的に異なります。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ HISTORY ══ -->
+<section id="history">
+  <div class="container">
+    <div class="section-label reveal">Chapter 03 — 理論の誕生</div>
+    <h2 class="reveal">マイケル・ホワイトと<br>デイヴィッド・エプストンの発見</h2>
+
+    <p class="reveal">ナラティブアプローチは1980年代のオーストラリアとニュージーランドで生まれました。家族療法の流れを汲みながら、当時主流だった「問題は個人（または家族システム）の中にある」という前提を根本から問い直しました。</p>
+
+    <div class="timeline reveal">
+      <div class="timeline-item">
+        <div class="timeline-year">1970年代</div>
+        <div class="timeline-content">
+          <h4>家族療法との出会い</h4>
+          <p>ホワイトはアデレードで社会福祉士として働き始め、家族システム論・サイバネティクスに影響を受ける。しかし「システムが問題を維持している」という見方に限界を感じ始める。</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1980年代初頭</div>
+        <div class="timeline-content">
+          <h4>フーコーとの出会い</h4>
+          <p>ホワイトがミシェル・フーコーの「権力・知識」論を読み、専門的知識による人のラベリングと支配という視点を臨床実践に接続。「問題は個人の中にない」という思想の核が形成される。</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1984年</div>
+        <div class="timeline-content">
+          <h4>外在化の実践開始</h4>
+          <p>「遺糞症（encopresis）」の子どもたちとの実践で、問題（「うんちの問題」と命名）を子どもから分離する「外在化」の効果を確認。初期の重要論文を発表。</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1989</div>
+        <div class="timeline-content">
+          <h4>エプストンとの共著論文</h4>
+          <p>ニュージーランドのデイヴィッド・エプストンとの共同研究が深まり、「手紙療法（therapeutic documents）」「証人実践」などの技法が体系化される。</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">1990</div>
+        <div class="timeline-content">
+          <h4>主著の出版</h4>
+          <p><em>Narrative Means to Therapeutic Ends</em>（邦題：物語としての家族）が出版。世界的に普及し、ポストモダン臨床理論の代表的テキストとなる。</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-year">2008</div>
+        <div class="timeline-content">
+          <h4>ホワイトの急逝</h4>
+          <p>ホワイトは心臓発作で逝去（享年59歳）。しかし<em>Maps of Narrative Practice</em>（邦題：ナラティブ実践地図）が遺著として残され、現在も実践の指針となっている。</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="reveal">ナラティブアプローチは単一の「技法」ではなく、<strong>人間観・権力観・知識観を含む思想的立場</strong>です。「技法だけ使う」ことは、その思想的基盤を抜いた使い方になりえます。この点は実践上の重要な注意事項として後述します。</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ EXTERNALISATION ══ -->
+<section id="externalisation" class="section-warm">
+  <div class="container">
+    <div class="section-label reveal">Chapter 04 — 核心技法①</div>
+    <h2 class="reveal">外在化<br><span style="font-size:18px;font-weight:300;">「問題は問題であり、人は問題ではない」</span></h2>
+
+    <p class="reveal">外在化（externalisation）はナラティブアプローチの最も特徴的な実践です。「不安」「自信のなさ」「怒り」といった問題を、人の性格や内面の欠陥としてではなく、<strong>人とは別の存在として言語化</strong>することで、問題との関係を変えることを可能にします。</p>
+
+    <!-- Before / After -->
+    <div class="split reveal">
+      <div class="split-panel" style="background:var(--terracotta-pale); border-color:var(--terracotta);">
+        <div class="panel-label red">内在化した言語（一般的）</div>
+        <p style="font-size:13px; font-family:var(--sans); line-height:1.8;">「<strong>私は</strong>自信がない人間だ」<br>「<strong>私は</strong>続かない性格だ」<br>「<strong>私が</strong>弱いから職場で問題を起こした」</p>
+        <p style="font-size:12px; font-family:var(--sans); color:var(--terracotta); margin-top:12px;">→ 問題と人が一体化している<br>→ 変化の余地が見えにくい</p>
+      </div>
+      <div class="split-panel" style="background:var(--teal-pale); border-color:var(--teal);">
+        <div class="panel-label teal">外在化した言語（ナラティブ的）</div>
+        <p style="font-size:13px; font-family:var(--sans); line-height:1.8;">「<strong>自信喪失</strong>が私にそう言わせている」<br>「<strong>あきらめ感</strong>が私を止めようとしている」<br>「<strong>怒りの嵐</strong>が職場で私の行動を乗っ取った」</p>
+        <p style="font-size:12px; font-family:var(--sans); color:var(--teal); margin-top:12px;">→ 問題と人が分離される<br>→ 問題と交渉・対峙する立場が生まれる</p>
+      </div>
+    </div>
+
+    <!-- Process flow -->
+    <div class="flow-diagram reveal">
+      <div class="section-label" style="margin-bottom:20px;">外在化の対話プロセス</div>
+      <div class="flow-step">
+        <div class="flow-num terracotta">1</div>
+        <div class="flow-content">
+          <h4>問題に名前をつける</h4>
+          <p>「自信のなさ」「焦り」「比較の声」など、利用者自身が問題を命名することが重要。命名は支援者が押しつけるものではなく、対話の中で探索される。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num terracotta">2</div>
+        <div class="flow-content">
+          <h4>問題の影響をマッピングする</h4>
+          <p>「その問題は、あなたの生活のどんな場面に現れますか？」「就職活動にどんな影響を与えていますか？」と、問題の影響範囲を外側から地図として描く。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num terracotta">3</div>
+        <div class="flow-content">
+          <h4>問題の影響を評価する（立場を明確にする）</h4>
+          <p>「その影響は、あなたにとってどうですか？」と、利用者自身が問題の影響に対して自分の立場を表明する機会を作る。これは支援者が評価するのではなく、当事者が主体的に評価する。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num terracotta">4</div>
+        <div class="flow-content">
+          <h4>その立場を正当化する（なぜそう思うのか）</h4>
+          <p>「なぜそう感じるのですか？」と問い、利用者の価値観・願い・希望を掘り起こす。この「なぜ」が次の「代替的物語」の素材となる。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialogue example -->
+    <div class="dialogue-box reveal">
+      <div class="dialogue-title">実践対話例 — 外在化の導入場面（就労移行）</div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「また実習先でミスしてしまって。やっぱり私はダメな人間なんだと思います」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「ミスをしたとき、どんなことが頭の中で起きていましたか？」</p>
+          <p class="dialogue-note">※ すぐに「ダメじゃない」と否定せず、まず経験を探索する</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「『また同じことをした。絶対続かない』という声が頭の中でずっと鳴っていて…」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「その『絶対続かない』という声、名前をつけるとしたら何と呼びたいですか？」</p>
+          <p class="dialogue-note">※ 問題を外側から見る視点を招待する</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「うーん…『あきらめ声』みたいな感じかな」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「『あきらめ声』ですね。その声は、今日の実習でどんなタイミングで一番大きくなりましたか？」</p>
+          <p class="dialogue-note">※ 問題の影響を具体的にマッピングする段階へ</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="warning-box reveal">
+      <svg class="warning-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#b5533c" stroke-width="1.5">
+        <path d="M10 2 L18 17 L2 17 Z"/>
+        <path d="M10 8 L10 12" stroke-linecap="round"/>
+        <circle cx="10" cy="14.5" r="0.8" fill="#b5533c" stroke="none"/>
+      </svg>
+      <div>
+        <span class="warning-title">注意：外在化の誤用リスク</span>
+        <p class="warning-text">外在化は「言葉の言い換え」ではありません。「自信がないんですね、では自信のなさと戦いましょう！」のような使い方は、表面的な外在化に過ぎません。重要なのは、<strong>問題の影響に対して利用者が自分の立場を明確にし、価値観や希望を回復する</strong>プロセス全体です。また、一部の文化圏では「自己と問題の分離」という概念が異質に感じられる場合もあります。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ UNIQUE OUTCOMES ══ -->
+<section id="unique-outcomes">
+  <div class="container">
+    <div class="section-label reveal">Chapter 05 — 核心技法②</div>
+    <h2 class="reveal">ユニークな結果の探索<br><span style="font-size:18px;font-weight:300;">例外という「すき間」に光を当てる</span></h2>
+
+    <p class="reveal">支配的物語に<strong>収まらない出来事</strong>、つまり「あきらめ声に乗っ取られなかった瞬間」「自分がダメだという物語と矛盾する出来事」のことを、ナラティブアプローチでは<strong>ユニークな結果（unique outcomes）</strong>と呼びます。</p>
+
+    <p class="reveal">これは、解決志向アプローチの「例外（exceptions）」と似ていますが、目的が異なります。解決志向では「うまくいった時を増やす」ことを目指しますが、ナラティブアプローチでは<strong>ユニークな結果を、新しい物語の出発点（萌芽）として丁寧に意味づける</strong>ことを目指します。</p>
+
+    <!-- SVG: Timeline of story -->
+    <div class="svg-container reveal">
+      <svg width="660" height="220" viewBox="0 0 660 220" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+        <!-- dominant story line -->
+        <text x="20" y="24" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#b5533c" font-weight="700">支配的物語の流れ（失敗・問題の連鎖）</text>
+        <line x1="20" y1="60" x2="640" y2="60" stroke="#b5533c" stroke-width="2"/>
+        <!-- dots on dominant story -->
+        <circle cx="80" cy="60" r="6" fill="#b5533c"/>
+        <circle cx="200" cy="60" r="6" fill="#b5533c"/>
+        <circle cx="340" cy="60" r="6" fill="#b5533c"/>
+        <circle cx="480" cy="60" r="6" fill="#b5533c"/>
+        <circle cx="600" cy="60" r="6" fill="#b5533c"/>
+        <text x="80" y="82" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">退職</text>
+        <text x="200" y="82" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">ミス</text>
+        <text x="340" y="82" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">実習中断</text>
+        <text x="480" y="82" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">自己否定</text>
+        <text x="600" y="82" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">休職</text>
+
+        <!-- unique outcome dot (exception) -->
+        <circle cx="270" cy="60" r="10" fill="#2d6e6e" stroke="white" stroke-width="2"/>
+        <text x="270" y="64" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="white" font-weight="700">!</text>
+
+        <!-- arrow pointing up from unique outcome -->
+        <path d="M270 50 L270 140" stroke="#2d6e6e" stroke-width="1.5" stroke-dasharray="4 3"/>
+
+        <!-- alternative story starting from here -->
+        <text x="20" y="158" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#2d6e6e" font-weight="700">代替的物語（ユニークな結果から育てる）</text>
+        <path class="animate-path" id="alt-path" d="M270 170 Q350 155 430 165 Q510 172 600 155" stroke="#2d6e6e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <circle cx="270" cy="170" r="5" fill="#2d6e6e"/>
+        <circle cx="430" cy="165" r="5" fill="#2d6e6e"/>
+        <circle cx="600" cy="155" r="5" fill="#2d6e6e"/>
+
+        <!-- labels -->
+        <text x="270" y="190" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#2d6e6e">ユニークな結果</text>
+        <text x="270" y="203" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">（実習で1日続けた）</text>
+        <text x="430" y="190" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#2d6e6e">意味づけ</text>
+        <text x="600" y="185" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#2d6e6e">新しい物語</text>
+      </svg>
+    </div>
+
+    <div class="flow-diagram reveal">
+      <div class="section-label" style="margin-bottom:20px;">ユニークな結果を「育てる」問いの連鎖</div>
+      <div class="flow-step">
+        <div class="flow-num teal">A</div>
+        <div class="flow-content">
+          <h4>発見する問い</h4>
+          <p>「最近、『あきらめ声』がそれほど大きくなかった瞬間はありましたか？」「問題の影響を受けなかった例外はありますか？」</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num teal">B</div>
+        <div class="flow-content">
+          <h4>意味を問う</h4>
+          <p>「それはどんな意味があると思いますか？」「なぜそのとき踏みとどまれたと思いますか？」（例外に意味と理由を与える）</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num teal">C</div>
+        <div class="flow-content">
+          <h4>歴史へとつなぐ</h4>
+          <p>「振り返ると、以前にも似たようなことがありましたか？」「その力はどこから来ていると思いますか？」（例外をアイデンティティの歴史へ接続）</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num teal">D</div>
+        <div class="flow-content">
+          <h4>未来への投射</h4>
+          <p>「その力が生きるとしたら、どんな未来があり得るでしょうか？」（新しい物語の延長線を一緒に描く）</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ RE-AUTHORING ══ -->
+<section id="reauthoring" class="section-warm">
+  <div class="container">
+    <div class="section-label reveal">Chapter 06 — 核心技法③</div>
+    <h2 class="reveal">リ・オーサリング<br><span style="font-size:18px;font-weight:300;">「著者」として物語を書き直す</span></h2>
+
+    <p class="reveal">「リ・オーサリング（re-authoring）」とは、ユニークな結果を足がかりにして、<strong>利用者が自分の人生の「著者」として代替的な物語を作り直す</strong>プロセスです。ホワイトはブルーナーの「行為の地平線（landscape of action）」と「アイデンティティの地平線（landscape of identity）」という概念を使って、この対話を構造化しました。</p>
+
+    <!-- Two-level scaffold -->
+    <div class="flow-diagram reveal">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px;">
+        <div style="background:var(--gold-pale); border:1px solid var(--gold); border-radius:8px; padding:20px;">
+          <div class="panel-label" style="color:var(--gold);">行為の地平線</div>
+          <h4 style="font-size:14px; margin-bottom:8px;">Landscape of Action</h4>
+          <p style="font-size:12px; font-family:var(--sans); color:var(--ink-faint); margin:0; line-height:1.7;">「何が起きたか・何をしたか」の水準。<br>いつ、どこで、何を、誰と。<br>出来事の具体的な配列。</p>
+          <div style="margin-top:12px; padding:10px; background:white; border-radius:4px;">
+            <p style="font-size:12px; font-family:var(--sans); color:var(--ink); margin:0;">「その日、あなたは具体的に何をしましたか？」</p>
+          </div>
+        </div>
+        <div style="background:var(--teal-pale); border:1px solid var(--teal); border-radius:8px; padding:20px;">
+          <div class="panel-label teal">アイデンティティの地平線</div>
+          <h4 style="font-size:14px; margin-bottom:8px;">Landscape of Identity</h4>
+          <p style="font-size:12px; font-family:var(--sans); color:var(--ink-faint); margin:0; line-height:1.7;">「意味・価値・動機」の水準。<br>その行為が示す、願い・信念・価値観。<br>「どんな人であるか」の問い。</p>
+          <div style="margin-top:12px; padding:10px; background:white; border-radius:4px;">
+            <p style="font-size:12px; font-family:var(--sans); color:var(--ink); margin:0;">「それはあなたにとって何を大切にしているからですか？」</p>
+          </div>
+        </div>
+      </div>
+      <p style="font-size:12px; font-family:var(--sans); color:var(--ink-faint); text-align:center; margin:8px 0 0; line-height:1.6;">この二層を往来する対話が、「行動の変化」ではなく「物語の豊かさ」を育てる</p>
+    </div>
+
+    <!-- Dialogue example: re-authoring -->
+    <div class="dialogue-box reveal">
+      <div class="dialogue-title">実践対話例 — リ・オーサリングの場面</div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「先週の実習、最後まで踏みとどまれたと言っていましたね。その日、具体的にどんなことをしていましたか？」</p>
+          <p class="dialogue-note">→ 行為の地平線を具体化</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「『あきらめ声』が来たんですけど、一度トイレに行って深呼吸して、戻ってきました」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「それをしようと思ったのは、なぜだったんでしょう？」</p>
+          <p class="dialogue-note">→ アイデンティティの地平線へ</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「…職場の人に迷惑はかけたくない、というか、逃げるのだけは嫌だと思って」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「『逃げるのは嫌だ』——それはあなたにとって大切なことなんですね。それはいつ頃から大切にしてきたことですか？」</p>
+          <p class="dialogue-note">→ 価値観を歴史の中に位置づける</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「…子供の頃から、そういうの大事にしたかったんだと思います」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「その価値観を持ち続けてきた人を、どう呼びたいですか？」</p>
+          <p class="dialogue-note">→ アイデンティティ記述へ</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box reveal">
+      <svg class="warning-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#2d6e6e" stroke-width="1.5">
+        <rect x="4" y="3" width="12" height="16" rx="1.5"/>
+        <path d="M7 8 L13 8 M7 11 L13 11 M7 14 L11 14"/>
+      </svg>
+      <div>
+        <span class="info-title">治療的ドキュメント（therapeutic documents）</span>
+        <p class="info-text">エプストンが特に発展させた実践として、<strong>手紙・証明書・宣言文</strong>などの書面を用いる手法があります。「あなたが○○と戦い続けてきた歴史を確認する」手紙や、「責任の証明書」などのドキュメントは、新しい物語を外側から支える「証拠」として機能します。就労移行での活用としては、利用者の成長を文書化したメモや、本人が書く「自己紹介文の再構成」などが応用できます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ PRACTICE ══ -->
+<section id="practice">
+  <div class="container">
+    <div class="section-label reveal">Chapter 07 — 就労移行での実践</div>
+    <h2 class="reveal">就労移行支援における<br>具体的な活用場面</h2>
+
+    <p class="reveal">ナラティブアプローチは特定の「セッション」だけで行うものではありません。日常的な面談、グループ、文書作成など、さまざまな場面に応用できます。</p>
+
+    <!-- Accordion for each application -->
+    <div class="technique-section reveal">
+      <div class="technique-header" onclick="toggleTechnique(this)">
+        <span class="technique-num">SCENE 01</span>
+        <span class="technique-title">自己理解面談・アセスメント場面</span>
+        <span class="technique-sub">自己紹介・経歴整理</span>
+        <span class="technique-toggle">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6 L8 10 L12 6"/></svg>
+        </span>
+      </div>
+      <div class="technique-body">
+        <p>職歴のギャップや失敗体験を語るとき、利用者は「ダメな自分の証拠」として経歴を提示しがちです。ナラティブ的な問いは、同じ経歴を<strong>別の角度から照射</strong>します。</p>
+        <div class="dialogue-box" style="margin-top:16px;">
+          <div class="dialogue-title">活用できる問い</div>
+          <ul style="font-family:var(--sans); font-size:13px; color:var(--ink-faint); line-height:2; list-style:none; padding:0;">
+            <li>• 「その時期、どんなことを大切にしながら過ごしていましたか？」</li>
+            <li>• 「その退職を選んだことは、あなたのどんな価値観に基づいていたと思いますか？」</li>
+            <li>• 「そのつらい時期に、あなたが守り続けたものはありますか？」</li>
+            <li>• 「今の自分が当時の自分を見るとしたら、どんなことに気づきますか？」</li>
+          </ul>
+        </div>
+        <p style="font-size:13px; font-family:var(--sans);">これらの問いは、<strong>問題を否定するのではなく、問題の中にある利用者の意思や価値観を浮かび上がらせる</strong>ことを目的としています。</p>
+      </div>
+    </div>
+
+    <div class="technique-section reveal">
+      <div class="technique-header" onclick="toggleTechnique(this)">
+        <span class="technique-num">SCENE 02</span>
+        <span class="technique-title">実習後の振り返り面談</span>
+        <span class="technique-sub">出来事の意味づけ</span>
+        <span class="technique-toggle">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6 L8 10 L12 6"/></svg>
+        </span>
+      </div>
+      <div class="technique-body">
+        <p>実習後の振り返りは、支配的物語（「また失敗した」）が強化されやすい場面でもあります。ナラティブ的な振り返りは、ミスの「修正」だけでなく、<strong>その経験の「意味の豊かさ」を共同で探索</strong>します。</p>
+        <div class="split" style="margin-top:16px;">
+          <div class="split-panel accent-left" style="background:var(--terracotta-pale);">
+            <div class="panel-label red">一般的な振り返り</div>
+            <p style="font-size:13px; font-family:var(--sans); margin:0; line-height:1.7;">「どこが失敗でしたか」<br>「次はどうすれば良いですか」<br>→ 修正すべき問題の特定</p>
+          </div>
+          <div class="split-panel accent-teal" style="background:var(--teal-pale);">
+            <div class="panel-label teal">ナラティブ的振り返り</div>
+            <p style="font-size:13px; font-family:var(--sans); margin:0; line-height:1.7;">「どんな瞬間が意外と良かったですか」<br>「あなたはその状況に何を持ち込みましたか」<br>→ ユニークな結果の探索</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="technique-section reveal">
+      <div class="technique-header" onclick="toggleTechnique(this)">
+        <span class="technique-num">SCENE 03</span>
+        <span class="technique-title">障害の自己開示・就活準備</span>
+        <span class="technique-sub">自己物語の語り直し</span>
+        <span class="technique-toggle">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6 L8 10 L12 6"/></svg>
+        </span>
+      </div>
+      <div class="technique-body">
+        <p>障害を「欠陥」として語る自己開示は、利用者が内面化した支配的物語の表現です。ナラティブアプローチは、<strong>障害・疾患の経験を「その人の物語の一部」として再文脈化</strong>する支援を可能にします。</p>
+        <div class="dialogue-box" style="margin-top:16px;">
+          <div class="dialogue-title">対話例 — 自己開示文の共同構築</div>
+          <div class="dialogue-line">
+            <span class="dialogue-speaker client">利用者</span>
+            <div><p class="dialogue-text">「自己開示って、どう書けばいいのかわからなくて。『私は○○で欠点があります』という感じになってしまう」</p></div>
+          </div>
+          <div class="dialogue-line">
+            <span class="dialogue-speaker staff">支援者</span>
+            <div>
+              <p class="dialogue-text">「病名や症状ではなく、その経験から学んだことや、気づいたこと——そういう視点で書くとしたらどうなりそうですか？」</p>
+              <p class="dialogue-note">→ 経験の意味を「欠陥の証拠」ではなく「学びの歴史」として語り直す視点</p>
+            </div>
+          </div>
+        </div>
+        <div class="warning-box" style="margin-top:16px;">
+          <svg class="warning-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#b5533c" stroke-width="1.5">
+            <path d="M10 2 L18 17 L2 17 Z"/>
+            <path d="M10 8 L10 12" stroke-linecap="round"/>
+            <circle cx="10" cy="14.5" r="0.8" fill="#b5533c" stroke="none"/>
+          </svg>
+          <p class="warning-text">ただし、企業への合理的配慮依頼という実務的必要性も並存します。「障害の説明が不要」という意味ではなく、<strong>その説明を「問題の告白」ではなく「配慮の根拠の提示」として位置づけられるか</strong>、という文脈の問題です。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="technique-section reveal">
+      <div class="technique-header" onclick="toggleTechnique(this)">
+        <span class="technique-num">SCENE 04</span>
+        <span class="technique-title">グループプログラムへの応用</span>
+        <span class="technique-sub">集合的な証人実践</span>
+        <span class="technique-toggle">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="2" stroke-linecap="round"><path d="M4 6 L8 10 L12 6"/></svg>
+        </span>
+      </div>
+      <div class="technique-body">
+        <p>グループ場面では、「証人実践（witnessing）」の考え方が特に活用できます。一人のメンバーが自分の物語を語り、他のメンバーが<strong>評価や助言ではなく「共鳴」として応答する</strong>構造を作ることで、物語の強化を集合的に行います。</p>
+        <div class="dialogue-box" style="margin-top:16px;">
+          <div class="dialogue-title">証人応答の例（一般的な感想との違い）</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
+            <div style="background:var(--terracotta-pale); border-radius:6px; padding:14px;">
+              <p style="font-size:11px; font-family:var(--sans); color:var(--terracotta); font-weight:700; margin-bottom:6px;">×一般的な感想</p>
+              <p style="font-size:12px; font-family:var(--sans); color:var(--ink-faint); margin:0; line-height:1.7;">「すごいですね」<br>「頑張ったんですね」<br>（評価・称賛）</p>
+            </div>
+            <div style="background:var(--teal-pale); border-radius:6px; padding:14px;">
+              <p style="font-size:11px; font-family:var(--sans); color:var(--teal); font-weight:700; margin-bottom:6px;">○証人としての応答</p>
+              <p style="font-size:12px; font-family:var(--sans); color:var(--ink-faint); margin:0; line-height:1.7;">「あなたの話で、私は○○を思い出しました」<br>「あなたが大切にしていることが、○○の言葉に表れていると感じました」<br>（共鳴・発見）</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ WITNESS ══ -->
+<section id="witness" class="section-deep">
+  <div class="container">
+    <div class="section-label reveal">Chapter 08 — 証人実践</div>
+    <h2 class="reveal">証人実践と<br>アイデンティティの強化</h2>
+
+    <p class="reveal">ナラティブアプローチは「一対一の対話」だけでなく、<strong>新しい物語を他者が証言・応答することで物語を強化する</strong>という実践を重視します。これをホワイトは「定義的祝賀（definitional ceremony）」と呼びました。</p>
+
+    <!-- Witness process SVG -->
+    <div class="svg-container reveal">
+      <svg width="600" height="260" viewBox="0 0 600 260" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width:100%">
+        <!-- Center person -->
+        <circle cx="300" cy="130" r="36" fill="#1a1a1a" stroke="none"/>
+        <circle cx="300" cy="112" r="12" fill="none" stroke="#f7f4ef" stroke-width="1.5"/>
+        <path d="M282 130 Q282 148 300 148 Q318 148 318 130" fill="none" stroke="#f7f4ef" stroke-width="1.5"/>
+        <text x="300" y="182" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="11" fill="#1a1a1a">語り手</text>
+
+        <!-- Outer witnesses -->
+        <g opacity="0.85">
+          <!-- Top -->
+          <circle cx="300" cy="28" r="22" fill="#2d6e6e"/>
+          <circle cx="300" cy="20" r="8" fill="none" stroke="white" stroke-width="1.5"/>
+          <path d="M290 28 Q290 38 300 38 Q310 38 310 28" fill="none" stroke="white" stroke-width="1.5"/>
+          <text x="300" y="60" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#2d6e6e">証人①</text>
+
+          <!-- Bottom -->
+          <circle cx="300" cy="228" r="22" fill="#2d6e6e"/>
+          <circle cx="300" cy="220" r="8" fill="none" stroke="white" stroke-width="1.5"/>
+          <path d="M290 228 Q290 238 300 238 Q310 238 310 228" fill="none" stroke="white" stroke-width="1.5"/>
+          <text x="300" y="258" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#2d6e6e">証人②</text>
+
+          <!-- Left -->
+          <circle cx="100" cy="130" r="22" fill="#2d6e6e"/>
+          <circle cx="100" cy="122" r="8" fill="none" stroke="white" stroke-width="1.5"/>
+          <path d="M90 130 Q90 140 100 140 Q110 140 110 130" fill="none" stroke="white" stroke-width="1.5"/>
+          <text x="100" y="164" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#2d6e6e">証人③</text>
+
+          <!-- Right -->
+          <circle cx="500" cy="130" r="22" fill="#2d6e6e"/>
+          <circle cx="500" cy="122" r="8" fill="none" stroke="white" stroke-width="1.5"/>
+          <path d="M490 130 Q490 140 500 140 Q510 140 510 130" fill="none" stroke="white" stroke-width="1.5"/>
+          <text x="500" y="164" text-anchor="middle" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#2d6e6e">支援者</text>
+        </g>
+
+        <!-- Arrows: story goes out -->
+        <path d="M300 94 L300 52" stroke="#b5533c" stroke-width="1.5" marker-end="url(#arrow-out)"/>
+        <path d="M264 130 L124 130" stroke="#b5533c" stroke-width="1.5" marker-end="url(#arrow-out2)"/>
+
+        <!-- Arrows: resonance comes back -->
+        <path d="M300 52 L300 94" stroke="#2d6e6e" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow-back)"/>
+        <path d="M122 138 L262 138" stroke="#2d6e6e" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow-back2)"/>
+        <path d="M300 168 L300 206" stroke="#b5533c" stroke-width="1.5" marker-end="url(#arrow-out3)"/>
+        <path d="M300 208 L300 170" stroke="#2d6e6e" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow-back3)"/>
+        <path d="M336 130 L478 130" stroke="#b5533c" stroke-width="1.5" marker-end="url(#arrow-out4)"/>
+        <path d="M476 122 L338 122" stroke="#2d6e6e" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arrow-back4)"/>
+
+        <!-- Legend -->
+        <line x1="30" y1="240" x2="60" y2="240" stroke="#b5533c" stroke-width="1.5"/>
+        <text x="68" y="244" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">物語の語り</text>
+        <line x1="150" y1="240" x2="180" y2="240" stroke="#2d6e6e" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <text x="188" y="244" font-family="'Noto Sans JP', sans-serif" font-size="10" fill="#6b6b6b">証人の応答（共鳴）</text>
+
+        <defs>
+          <marker id="arrow-out" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#b5533c"/></marker>
+          <marker id="arrow-out2" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#b5533c"/></marker>
+          <marker id="arrow-out3" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#b5533c"/></marker>
+          <marker id="arrow-out4" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#b5533c"/></marker>
+          <marker id="arrow-back" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#2d6e6e"/></marker>
+          <marker id="arrow-back2" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#2d6e6e"/></marker>
+          <marker id="arrow-back3" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#2d6e6e"/></marker>
+          <marker id="arrow-back4" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" fill="#2d6e6e"/></marker>
+        </defs>
+      </svg>
+    </div>
+
+    <div class="flow-diagram reveal">
+      <div class="section-label" style="margin-bottom:20px;">定義的祝賀の4段階（ホワイト, 2007）</div>
+      <div class="flow-step">
+        <div class="flow-num gold">1</div>
+        <div class="flow-content">
+          <h4>語り手が物語を語る</h4>
+          <p>語り手は自分の経験・ユニークな結果を語る。証人たちは「聴衆」として耳を傾ける。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num gold">2</div>
+        <div class="flow-content">
+          <h4>証人が「共鳴」を語る</h4>
+          <p>証人は評価・助言・同情ではなく、「あなたの話の中で、私が注目したこと」「私の心を動かした言葉」「それが示すあなたのアイデンティティの像」を語る。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num gold">3</div>
+        <div class="flow-content">
+          <h4>語り手が「聴かれた」体験を語る</h4>
+          <p>語り手は、証人の応答を聴いてどんな体験をしたかを語る。「どの言葉が心に届きましたか」という問いで引き出す。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num gold">4</div>
+        <div class="flow-content">
+          <h4>全員で対話を振り返る</h4>
+          <p>このやりとりを通じて何が生まれたかを、全員で確認する。物語が共同で豊かになった体験を祝う。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ COMPARE / CRITIQUE ══ -->
+<section id="critique">
+  <div class="container">
+    <div class="section-label reveal">Chapter 09 — 批判的検討</div>
+    <h2 class="reveal">ナラティブアプローチを<br>批判的に見る</h2>
+
+    <p class="reveal">支援理論を使う際、その限界と批判を理解しておくことは誠実な実践の基本です。ナラティブアプローチには複数の正当な批判があります。</p>
+
+    <!-- Critique points -->
+    <div class="card-grid reveal" style="grid-template-columns:1fr;">
+      <div class="concept-card" style="border-left:3px solid var(--terracotta);">
+        <div class="card-title">① エビデンスの限界</div>
+        <p class="card-desc">ランダム化比較試験（RCT）によるエビデンスはCBTや行動活性化に比べて少ない。これはナラティブアプローチの実践性質（標準化が難しい、プロセスが高度に個別的）に起因する面が大きいが、「エビデンスが弱い」という事実は変わらない。Linardon et al. (2017) のような系統的レビューでは、摂食障害への一定の有効性が示されているが、就労支援への直接的エビデンスは蓄積中の段階。</p>
+      </div>
+      <div class="concept-card" style="border-left:3px solid var(--terracotta);">
+        <div class="card-title">② 「物語を変えれば現実が変わる」という誤解リスク</div>
+        <p class="card-desc">「物語の書き直し」は、構造的問題（差別・貧困・労働環境）を個人の語りの問題に還元する危険と常に隣り合わせ。就労移行においても、「物語を変えれば就職できる」という誤った楽観主義は、実際の障壁（採用差別・合理的配慮の不足）を不可視化する。ナラティブアプローチは、社会構造への批判的視点と同時に使われなければならない。</p>
+      </div>
+      <div class="concept-card" style="border-left:3px solid var(--terracotta);">
+        <div class="card-title">③ 文化的文脈の問題</div>
+        <p class="card-desc">「自己物語」「個人のアイデンティティ」という概念は、西洋的な個人主義的自己観を前提とする面がある。集団主義的文化圏（日本を含む）では、「自分の物語」と「家族・コミュニティの物語」の分離がそもそも自然ではない場合がある。この点は日本での実践において意識的に修正・調整が必要。</p>
+      </div>
+      <div class="concept-card" style="border-left:3px solid var(--terracotta);">
+        <div class="card-title">④ 習熟の難しさ</div>
+        <p class="card-desc">外在化の問い、スキャフォールディング、証人実践——いずれも、表面的な「言葉の言い換え」にとどまると効果がない。「外在化を使っているつもりで単に言い換えているだけ」になるリスクがある。ナラティブアプローチの実践には、十分なスーパーバイズと継続的な省察が必要。</p>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <h3 class="reveal" style="margin-top:48px;">他のアプローチとの比較</h3>
+    <p class="reveal">ナラティブアプローチを他のアプローチと比較すると、それぞれの強みと限界が明確になります。どれが「正解」かではなく、どの文脈で何が適切かという問いです。</p>
+
+    <div class="reveal" style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>観点</th>
+            <th>ナラティブアプローチ</th>
+            <th>CBT（認知行動療法）</th>
+            <th>解決志向アプローチ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>問題の位置づけ</td>
+            <td>社会・権力関係の産物として外側に</td>
+            <td>認知パターンとして個人の内側に</td>
+            <td>問題より解決に焦点、位置づけは問わない</td>
+          </tr>
+          <tr>
+            <td>変化の単位</td>
+            <td>物語・アイデンティティ</td>
+            <td>認知・行動パターン</td>
+            <td>解決行動・例外</td>
+          </tr>
+          <tr>
+            <td>過去の扱い</td>
+            <td>過去を「代替的歴史」として再文脈化</td>
+            <td>現在の認知パターンの起源として参照</td>
+            <td>過去より未来・解決に重点</td>
+          </tr>
+          <tr>
+            <td>エビデンス</td>
+            <td>蓄積中（一部あり）</td>
+            <td>豊富（多数のRCT）</td>
+            <td>中程度（実践研究多数）</td>
+          </tr>
+          <tr>
+            <td>就労移行との親和性</td>
+            <td>高（自己物語の再構築）</td>
+            <td>高（スキル訓練・認知修正）</td>
+            <td>高（コーチング的活用）</td>
+          </tr>
+          <tr>
+            <td>主な注意点</td>
+            <td>構造的問題の不可視化リスク</td>
+            <td>感情の深さへの配慮が必要</td>
+            <td>問題の深刻さを軽視するリスク</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box reveal" style="margin-top:32px;">
+      <svg class="warning-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#2d6e6e" stroke-width="1.5">
+        <circle cx="10" cy="10" r="8"/>
+        <path d="M10 6 L10 10.5" stroke-linecap="round"/>
+        <circle cx="10" cy="13.5" r="0.8" fill="#2d6e6e" stroke="none"/>
+      </svg>
+      <div>
+        <span class="info-title">実践上の原則：理論の複数性を生かす</span>
+        <p class="info-text">ナラティブアプローチは「これだけを使う」ものではなく、他のアプローチと組み合わせることで機能します。KBCの実践では、利用者の状態・局面・目的に応じて、認知行動的アプローチ、解決志向アプローチ、ナラティブアプローチを統合的に活用することが現実的です。<strong>どのアプローチを使うかよりも、そのアプローチが何を大切にしているかを理解したうえで使うこと</strong>が、支援の質を左右します。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ SUMMARY ══ -->
+<section class="section-dark">
+  <div class="container">
+    <div class="section-label reveal">まとめ</div>
+    <h2 class="reveal">ナラティブアプローチが<br>問い直すもの</h2>
+
+    <p class="reveal">ナラティブアプローチは「問題のある人をどう直すか」という問いそのものを、「誰が問題を定義しているのか」「その定義はどんな物語の産物か」という問いへと変換します。</p>
+
+    <div class="card-grid reveal" style="margin-top:32px;">
+      <div class="concept-card" style="background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.15);">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#d4795f" stroke-width="1.5">
+          <circle cx="20" cy="14" r="8"/>
+          <path d="M8 36 Q8 28 20 28 Q32 28 32 36"/>
+          <path d="M28 10 Q34 14 30 20" stroke-linecap="round"/>
+        </svg>
+        <div class="card-title" style="color:#f7f4ef;">人は問題ではない</div>
+        <p class="card-desc" style="color:rgba(247,244,239,0.6);">問題と人を分けることで、利用者は自分の人生の著者として立つ余地を回復する。</p>
+      </div>
+      <div class="concept-card" style="background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.15);">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#4a9090" stroke-width="1.5">
+          <rect x="6" y="8" width="28" height="26" rx="2"/>
+          <path d="M12 16 L28 16 M12 21 L28 21 M12 26 L22 26"/>
+          <path d="M22 4 L22 12" stroke-linecap="round"/>
+        </svg>
+        <div class="card-title" style="color:#f7f4ef;">物語は書き直せる</div>
+        <p class="card-desc" style="color:rgba(247,244,239,0.6);">支配的物語は唯一の現実ではない。ユニークな結果が代替的物語の萌芽となる。</p>
+      </div>
+      <div class="concept-card" style="background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.15);">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#c5a55a" stroke-width="1.5">
+          <circle cx="14" cy="14" r="7"/>
+          <circle cx="28" cy="26" r="7"/>
+          <path d="M18 18 L24 22" stroke-dasharray="3 2"/>
+        </svg>
+        <div class="card-title" style="color:#f7f4ef;">関係の中で物語は育つ</div>
+        <p class="card-desc" style="color:rgba(247,244,239,0.6);">物語は一人では変わらない。証人の存在が、新しいアイデンティティを社会的に支える。</p>
+      </div>
+    </div>
+
+    <div class="quote-block reveal" style="background:rgba(255,255,255,0.06); border-left-color:var(--terracotta-light);">
+      <p class="quote-text" style="color:rgba(247,244,239,0.9);">「問題は人から切り離されることができる。そして切り離されれば、問題と人の関係は変わりうる。」</p>
+      <p class="quote-source" style="color:rgba(247,244,239,0.4);">— White, M. (2007). <em>Maps of Narrative Practice.</em> Norton.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ SELF-UNDERSTANDING ══ -->
+<section id="self-understanding" class="section-warm">
+  <div class="container">
+    <div class="section-label reveal">Chapter 10 — 実践応用</div>
+    <h2 class="reveal">幼少期から振り返る<br>自己理解面談との接続</h2>
+
+    <p class="reveal">KBCで実施している「幼少期から振り返る自己理解面談」とナラティブアプローチは、<strong>高い親和性を持ちながら、問いの設計次第で全く別物になる</strong>という関係にあります。ここではその接続点と分岐点を整理します。</p>
+
+    <!-- 親和性の根拠 -->
+    <div class="quote-block reveal">
+      <p class="quote-text">親和性の核心：幼少期まで遡る構造は、ナラティブアプローチが言う「アイデンティティの地平線への歴史的探索」と同じ論理を持っている。過去を掘ることで、ユニークな結果を「ずっとあった力」として歴史に位置づけられる。</p>
+    </div>
+
+    <!-- 二つの道の分岐 -->
+    <h3 class="reveal" style="margin-top: 40px;">同じ「振り返り」でも、問いで分岐する</h3>
+    <p class="reveal">自己理解面談が「経歴の棚卸し」で終わるか「アイデンティティの再著述」になるかは、<strong>問いの方向が決める</strong>。同じ出来事を話していても、支援者がどこに光を当てるかで利用者の経験は根本的に変わります。</p>
+
+    <!-- Split comparison -->
+    <div class="split reveal">
+      <div class="split-panel" style="background:var(--terracotta-pale); border-color:var(--terracotta); border-left-width:3px;">
+        <div class="panel-label red">経歴整理に留まる問い</div>
+        <ul style="font-family:var(--sans); font-size:13px; color:var(--ink-faint); line-height:2.1; list-style:none; padding:0; margin:0;">
+          <li>「小学校ではどんな子でしたか？」</li>
+          <li>「その頃から困りごとはありましたか？」</li>
+          <li>「なぜ辞めたんですか？」</li>
+          <li>「その失敗から何を学びましたか？」</li>
+        </ul>
+        <p style="font-size:12px; font-family:var(--sans); color:var(--terracotta); margin-top:14px; margin-bottom:0;">→ 出来事の記述・原因探し<br>→ 支配的物語が強化されやすい</p>
+      </div>
+      <div class="split-panel" style="background:var(--teal-pale); border-color:var(--teal); border-left-width:3px;">
+        <div class="panel-label teal">ナラティブ的な問い</div>
+        <ul style="font-family:var(--sans); font-size:13px; color:var(--ink-faint); line-height:2.1; list-style:none; padding:0; margin:0;">
+          <li>「その頃、何を大切にしていましたか？」</li>
+          <li>「しんどい時期に、守り続けたものはありますか？」</li>
+          <li>「その選択は、あなたのどんな思いからでしたか？」</li>
+          <li>「当時の自分が見せていた力を、今どう名付けますか？」</li>
+        </ul>
+        <p style="font-size:12px; font-family:var(--sans); color:var(--teal); margin-top:14px; margin-bottom:0;">→ 意味・価値観・願いの探索<br>→ 代替的歴史の素材が生まれる</p>
+      </div>
+    </div>
+
+    <!-- Flow: 面談の理想的な構造 -->
+    <h3 class="reveal" style="margin-top: 40px;">ナラティブ的に設計した自己理解面談の流れ</h3>
+    <p class="reveal">以下は、幼少期から振り返る面談をナラティブアプローチの文脈で再設計したときの構造案です。「何があったか」と「それはあなたにとって何だったか」を意図的に往来します。</p>
+
+    <div class="flow-diagram reveal">
+      <div class="flow-step">
+        <div class="flow-num terracotta">1</div>
+        <div class="flow-content">
+          <h4>時代ごとに「出来事」を確認する（行為の地平線）</h4>
+          <p>幼少期・学童期・思春期・社会人期と、各時期の出来事を簡潔に確認。ここは情報収集に留める。ただし「うまくいかなかったこと」と同じ比重で「それでも続けていたこと・好きだったこと」も丁寧に拾う。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num terracotta">2</div>
+        <div class="flow-content">
+          <h4>各時期の「ユニークな結果」を探す</h4>
+          <p>「しんどかった時期に、何か一つだけ続けていたことはありましたか？」「周りが大変に見えた中で、あなたはどんなことにこだわっていましたか？」——支配的物語（失敗・困難）の連鎖の中に、例外を見つける。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num terracotta">3</div>
+        <div class="flow-content">
+          <h4>例外に「意味と名前」を与える（アイデンティティの地平線）</h4>
+          <p>「なぜその時それができたと思いますか？」「その力はどこから来ていると思いますか？」——例外を単なる偶然ではなく、その人のアイデンティティの表現として意味づける。「その力を一言で表すとしたら？」と命名を促す。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num terracotta">4</div>
+        <div class="flow-content">
+          <h4>力の「歴史的系譜」を描く</h4>
+          <p>「実は小学校の頃にも同じことがありましたか？」「その力はいつ頃から自分の中にあると思いますか？」——ユニークな結果を点ではなく線としてつなぎ、「ずっとあった力の歴史」を共同で描く。</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num terracotta">5</div>
+        <div class="flow-content">
+          <h4>「その力が生きる未来」を一緒に想像する</h4>
+          <p>「その力が職場で活きるとしたら、どんな場面が浮かびますか？」——過去から育てた物語を、就労という未来への文脈に接続する。ここで初めて「どんな仕事・職場が合いそうか」の議論が実質的な意味を持つ。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 対話例：面談場面 -->
+    <div class="dialogue-box reveal">
+      <div class="dialogue-title">実践対話例 — 自己理解面談でのナラティブ的転換</div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「中学は不登校で、高校も中退していて…本当に何もできなかった時期ばかりで」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「その時期、学校以外で、何かだけはやっていた、というものはありましたか？どんな小さいことでも」</p>
+          <p class="dialogue-note">→ 支配的物語（何もできなかった）の連鎖に、ユニークな結果を探す問いを入れる</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「…ゲームは毎日やってました。あと、攻略サイトを自分で作っていたりしていた」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「攻略サイトを自分で作っていたんですね。それって、誰かに頼まれたわけじゃなく、自分でやりたくてやっていた？」</p>
+          <p class="dialogue-note">→ 主体性・自発性を確認する</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「そうですね、誰かに見てもらいたくて、自分なりに丁寧に作ってました」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「『誰かに見てもらいたくて、丁寧に作る』——それはどんな力だと思いますか？名前をつけるとしたら？」</p>
+          <p class="dialogue-note">→ アイデンティティの地平線へ。命名を促す</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker client">利用者</span>
+        <div>
+          <p class="dialogue-text">「…『伝えたがり』みたいな？ちゃんと伝えることにこだわりたい、という感じかな」</p>
+        </div>
+      </div>
+      <div class="dialogue-line">
+        <span class="dialogue-speaker staff">支援者</span>
+        <div>
+          <p class="dialogue-text">「『伝えたがり』。その力、学校に行けなかった頃も持ち続けていたんですね。振り返ると、他にも同じ力が出ていた瞬間、思い当たりますか？」</p>
+          <p class="dialogue-note">→ ユニークな結果を歴史的系譜として広げる</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 注意点：トラウマとの交差 -->
+    <h3 class="reveal" style="margin-top: 40px;">見落とせない注意点：幼少期の探索とトラウマ</h3>
+
+    <div class="warning-box reveal">
+      <svg class="warning-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#b5533c" stroke-width="1.5">
+        <path d="M10 2 L18 17 L2 17 Z"/>
+        <path d="M10 8 L10 12" stroke-linecap="round"/>
+        <circle cx="10" cy="14.5" r="0.8" fill="#b5533c" stroke="none"/>
+      </svg>
+      <div>
+        <span class="warning-title">幼少期の探索は、トラウマ記憶・愛着の問題に触れる可能性がある</span>
+        <p class="warning-text">「振り返らせること」と「安全に語り直せる空間を作ること」は、別のスキルです。ナラティブアプローチは再受傷を防ぐことを重視しますが、それはトラウマインフォームドケアの知識と組み合わせないと機能しません。以下の点を意識した上で実施してください。</p>
+      </div>
+    </div>
+
+    <div class="card-grid reveal">
+      <div class="concept-card" style="border-left:3px solid var(--gold);">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#8a6f3e" stroke-width="1.5">
+          <path d="M20 6 L20 20 M14 12 L20 6 L26 12" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="10" y="20" width="20" height="14" rx="2"/>
+          <path d="M16 27 L24 27" stroke-linecap="round"/>
+        </svg>
+        <div class="card-title">利用者がコントロールできる量を守る</div>
+        <p class="card-desc">「どこまで話すかはあなたが決めていい」という安全の枠を最初に提示する。詳細を引き出そうとする問いは避け、「話せる範囲で」という言葉を使う。</p>
+      </div>
+      <div class="concept-card" style="border-left:3px solid var(--gold);">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#8a6f3e" stroke-width="1.5">
+          <circle cx="20" cy="20" r="14"/>
+          <path d="M20 14 L20 20 L26 23" stroke-linecap="round"/>
+          <path d="M10 10 Q8 20 14 28" stroke-dasharray="3 2"/>
+        </svg>
+        <div class="card-title">過去に「引き込まれる」兆候を見る</div>
+        <p class="card-desc">利用者が急に沈黙する、表情が変わる、呼吸が浅くなるなどのサインは、フラッシュバックや解離の可能性。「今ここに戻ってきてもらう」問いを用意しておく。</p>
+      </div>
+      <div class="concept-card" style="border-left:3px solid var(--gold);">
+        <svg class="card-icon" viewBox="0 0 40 40" fill="none" stroke="#8a6f3e" stroke-width="1.5">
+          <path d="M12 20 Q12 10 20 8 Q28 10 28 20 Q28 32 20 34 Q12 32 12 20Z"/>
+          <path d="M20 14 L20 22" stroke-linecap="round"/>
+          <circle cx="20" cy="26" r="1.2" fill="#8a6f3e" stroke="none"/>
+        </svg>
+        <div class="card-title">「今の自分」を錨にする</div>
+        <p class="card-desc">過去の探索は常に「今の自分が過去を見ている」という視点で行う。「当時の自分に今の自分が声をかけるとしたら？」という問いは、現在の安全な立場から過去を眺める距離を保てる。</p>
+      </div>
+    </div>
+
+    <!-- 比較表：設計の違い -->
+    <h3 class="reveal" style="margin-top: 40px;">自己理解面談の設計：ナラティブ的視点からの整理</h3>
+
+    <div class="reveal" style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>面談の要素</th>
+            <th>従来の設計</th>
+            <th>ナラティブ的に再設計した場合</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>目的</td>
+            <td>特性・強み・課題の把握（アセスメント）</td>
+            <td>代替的な自己物語の共同構築（リ・オーサリング）</td>
+          </tr>
+          <tr>
+            <td>支援者の役割</td>
+            <td>情報を収集・整理する専門家</td>
+            <td>物語の共同探索者（co-investigator）</td>
+          </tr>
+          <tr>
+            <td>過去の扱い</td>
+            <td>現在の特性を説明する背景</td>
+            <td>ユニークな結果と価値観を掘り起こす素材</td>
+          </tr>
+          <tr>
+            <td>中心的な問い</td>
+            <td>「何があったか」「なぜそうなったか」</td>
+            <td>「それはあなたにとって何だったか」「何を大切にしていたか」</td>
+          </tr>
+          <tr>
+            <td>成果物のイメージ</td>
+            <td>強み・課題のリスト、職業適性の見立て</td>
+            <td>「自分の力の歴史」と「それが生きる未来の物語」</td>
+          </tr>
+          <tr>
+            <td>注意点</td>
+            <td>問題の列挙が自己否定を強化しやすい</td>
+            <td>トラウマとの交差に対するTICの知識が必要</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="info-box reveal" style="margin-top: 32px;">
+      <svg class="warning-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#2d6e6e" stroke-width="1.5">
+        <circle cx="10" cy="10" r="8"/>
+        <path d="M10 6 L10 10.5" stroke-linecap="round"/>
+        <circle cx="10" cy="13.5" r="0.8" fill="#2d6e6e" stroke="none"/>
+      </svg>
+      <div>
+        <span class="info-title">アセスメントとしての機能も失わない</span>
+        <p class="info-text">ナラティブ的に再設計した自己理解面談は、アセスメントとしての機能を捨てるものではありません。「利用者の価値観・大切にしていること・力の歴史」という情報は、職場マッチングや合理的配慮の検討において、<strong>特性のリストよりもはるかに豊かで実用的な情報</strong>になります。「どんな場面でその力が発揮されやすいか」という問いは、適性の見立てとしても使えます。ナラティブアプローチとアセスメントは対立しません——問いの設計で統合できます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ REFERENCES ══ -->
+<section id="references">
+  <div class="container">
+    <div class="section-label reveal">参考文献・情報ソース</div>
+    <h2 class="reveal">References</h2>
+
+    <p class="reveal" style="font-size:13px; font-family:var(--sans); color:var(--ink-faint);">以下は本図解の作成に使用した一次文献・主要文献です。クリックでアクセスできます（アクセス可否は所属機関の契約状況に依存する場合があります）。</p>
+
+    <ul class="ref-list reveal">
+      <li>
+        <strong>White, M. &amp; Epston, D. (1990).</strong> <em>Narrative Means to Therapeutic Ends.</em> New York: W. W. Norton. （邦訳：物語としての家族, 小森康永訳, 金剛出版, 1992）<br>
+        <a href="https://wwnorton.com/books/9780393700985" target="_blank" rel="noopener">→ 出版社ページ</a>
+      </li>
+      <li>
+        <strong>White, M. (2007).</strong> <em>Maps of Narrative Practice.</em> New York: W. W. Norton. （邦訳：ナラティブ実践地図, 小森康永・奥野光訳, 金剛出版, 2009）<br>
+        <a href="https://wwnorton.com/books/9780393705164" target="_blank" rel="noopener">→ 出版社ページ</a>
+      </li>
+      <li>
+        <strong>Morgan, A. (2000).</strong> <em>What is Narrative Therapy? An Easy-to-Read Introduction.</em> Adelaide: Dulwich Centre Publications.<br>
+        <a href="https://dulwichcentre.com.au/what-is-narrative-therapy/" target="_blank" rel="noopener">→ Dulwich Centre（ホワイトの研究所）公式ページ</a>
+      </li>
+      <li>
+        <strong>Linardon, J., Wade, T. D., de la Piedad Garcia, X., &amp; Brennan, L. (2017).</strong> The efficacy of cognitive-behavioral therapy for eating disorders: A systematic review and meta-analysis. <em>Journal of Consulting and Clinical Psychology, 85</em>(11), 1080–1094.<br>
+        <a href="https://doi.org/10.1037/ccp0000245" target="_blank" rel="noopener">→ DOI: 10.1037/ccp0000245</a>
+        <br><span style="font-size:11px; color:var(--ink-faint);">（ナラティブアプローチのエビデンス水準の比較検討に使用）</span>
+      </li>
+      <li>
+        <strong>McAdams, D. P. (1993).</strong> <em>The Stories We Live By: Personal Myths and the Making of the Self.</em> New York: Guilford Press.<br>
+        <a href="https://www.guilford.com/books/The-Stories-We-Live-By/Dan-McAdams/9781572301887" target="_blank" rel="noopener">→ 出版社ページ</a>
+      </li>
+      <li>
+        <strong>Bruner, J. (1986).</strong> <em>Actual Minds, Possible Worlds.</em> Cambridge, MA: Harvard University Press.<br>
+        <a href="https://www.hup.harvard.edu/catalog.php?isbn=9780674003668" target="_blank" rel="noopener">→ Harvard University Press</a>
+        <br><span style="font-size:11px; color:var(--ink-faint);">（行為の地平線・アイデンティティの地平線の概念の源泉）</span>
+      </li>
+      <li>
+        <strong>Foucault, M. (1977).</strong> <em>Discipline and Punish: The Birth of the Prison.</em> New York: Pantheon Books.<br>
+        <span style="font-size:11px; color:var(--ink-faint);">（権力・知識論の基盤。ホワイトの理論的根拠として参照）</span>
+      </li>
+      <li>
+        <strong>Dulwich Centre（マイケル・ホワイト設立の研究・実践センター）</strong><br>
+        <a href="https://dulwichcentre.com.au/" target="_blank" rel="noopener">→ https://dulwichcentre.com.au/</a><br>
+        <span style="font-size:11px; color:var(--ink-faint);">論文・事例・ワークショップ情報を多数公開。日本語資料も一部あり。</span>
+      </li>
+      <li>
+        <strong>小森康永・野村直樹（2003）.</strong>『ナラティヴ・プラクティス —会話を続けよう』. 名古屋: 名古屋大学出版会.<br>
+        <span style="font-size:11px; color:var(--ink-faint);">日本語圏での代表的な実践・理論解説書</span>
+      </li>
+      <li>
+        <strong>Epston, D. (1994).</strong> Extending the conversation. <em>Family Therapy Networker, 18</em>(6), 31–37, 62–63.<br>
+        <span style="font-size:11px; color:var(--ink-faint);">（治療的ドキュメント・手紙療法の実践論文）</span>
+      </li>
+    </ul>
+
+    <div class="info-box reveal">
+      <svg class="warning-icon" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#2d6e6e" stroke-width="1.5">
+        <circle cx="10" cy="10" r="8"/>
+        <path d="M10 6 L10 10.5" stroke-linecap="round"/>
+        <circle cx="10" cy="13.5" r="0.8" fill="#2d6e6e" stroke="none"/>
+      </svg>
+      <div>
+        <span class="info-title">さらに学ぶために</span>
+        <p class="info-text">Dulwich Centre（<a href="https://dulwichcentre.com.au/" target="_blank" rel="noopener" style="color:var(--teal);">dulwichcentre.com.au</a>）には、日本語の翻訳資料も含む豊富な実践論文・事例が公開されています。特に「Externalising Conversations」と「Scaffolding Conversations」に関する論文は実践の基盤として有用です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>岡村雄一郎</p>
+</footer>
+
+<script>
+  // Progress bar
+  window.addEventListener('scroll', () => {
+    const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrolled = (winScroll / height) * 100;
+    document.getElementById('progress-bar').style.width = scrolled + '%';
+  });
+
+  // Reveal animation
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // animate SVG paths when they come into view
+        const paths = entry.target.querySelectorAll('.animate-path');
+        paths.forEach(p => p.classList.add('animated'));
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  revealEls.forEach(el => revealObserver.observe(el));
+
+  // also animate paths in containers
+  const svgContainers = document.querySelectorAll('.svg-container');
+  const svgObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const paths = entry.target.querySelectorAll('.animate-path');
+        paths.forEach(p => p.classList.add('animated'));
+      }
+    });
+  }, { threshold: 0.2 });
+  svgContainers.forEach(el => svgObserver.observe(el));
+
+  // Nav dots active state
+  const sections = document.querySelectorAll('section[id]');
+  const navDots = document.querySelectorAll('.nav-dot');
+
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navDots.forEach(d => d.classList.remove('active'));
+        const activeId = entry.target.id;
+        const activeDot = document.querySelector(`.nav-dot[href="#${activeId}"]`);
+        if (activeDot) activeDot.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => navObserver.observe(s));
+
+  // Technique accordion
+  function toggleTechnique(header) {
+    const body = header.nextElementSibling;
+    const toggle = header.querySelector('.technique-toggle');
+    const isOpen = body.classList.contains('open');
+
+    // close all
+    document.querySelectorAll('.technique-body').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.technique-toggle').forEach(t => t.classList.remove('open'));
+
+    if (!isOpen) {
+      body.classList.add('open');
+      toggle.classList.add('open');
+    }
+  }
+
+  // Smooth nav click
+  navDots.forEach(dot => {
+    dot.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(dot.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Hero reveal on load
+  document.querySelectorAll('#hero .reveal').forEach((el, i) => {
+    setTimeout(() => el.classList.add('visible'), 200 + i * 150);
+  });
+</script>
+</body>
+</html>
